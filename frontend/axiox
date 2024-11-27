@@ -1,0 +1,123 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const GigForm = () => {
+  const [userId, setUserId] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [totalStars, setTotalStars] = useState(0);
+  const [starNumber, setStarNumber] = useState(0);
+  const [keywords, setKeywords] = useState('');
+  const [cover, setCover] = useState('');
+  const [firstThumbnail, setFirstThumbnail] = useState('');
+  const [secondThumbnail, setSecondThumbnail] = useState('');
+  const [thirdThumbnail, setThirdThumbnail] = useState('');
+  const [sales, setSales] = useState(0);
+
+  const [basicTitle, setBasicTitle] = useState('');
+  const [basicDescription, setBasicDescription] = useState('');
+  const [basicDeliveryTimeframe, setBasicDeliveryTimeframe] = useState('');
+  const [basicPrice, setBasicPrice] = useState(0);
+
+  const [standardTitle, setStandardTitle] = useState('');
+  const [standardDescription, setStandardDescription] = useState('');
+  const [standardDeliveryTimeframe, setStandardDeliveryTimeframe] = useState('');
+  const [standardPrice, setStandardPrice] = useState(0);
+
+  const [advancedTitle, setAdvancedTitle] = useState('');
+  const [advancedDescription, setAdvancedDescription] = useState('');
+  const [advancedDeliveryTimeframe, setAdvancedDeliveryTimeframe] = useState('');
+  const [advancedPrice, setAdvancedPrice] = useState(0);
+
+  const [proTitle, setProTitle] = useState('');
+  const [proDescription, setProDescription] = useState('');
+  const [proDeliveryTimeframe, setProDeliveryTimeframe] = useState('');
+  const [proPrice, setProPrice] = useState(0);
+
+  const [premiumTitle, setPremiumTitle] = useState('');
+  const [premiumDescription, setPremiumDescription] = useState('');
+  const [premiumDeliveryTimeframe, setPremiumDeliveryTimeframe] = useState('');
+  const [premiumPrice, setPremiumPrice] = useState(0);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = {
+      userId,
+      title,
+      description,
+      totalStars,
+      starNumber,
+      keywords: keywords.split(',').map((keyword) => keyword.trim()), // Split keywords by comma and trim spaces
+      pricing: {
+        basic: { title: basicTitle, description: basicDescription, deliveryTimeframe: basicDeliveryTimeframe, price: basicPrice },
+        standard: { title: standardTitle, description: standardDescription, deliveryTimeframe: standardDeliveryTimeframe, price: standardPrice },
+        advanced: { title: advancedTitle, description: advancedDescription, deliveryTimeframe: advancedDeliveryTimeframe, price: advancedPrice },
+        pro: { title: proTitle, description: proDescription, deliveryTimeframe: proDeliveryTimeframe, price: proPrice },
+        premium: { title: premiumTitle, description: premiumDescription, deliveryTimeframe: premiumDeliveryTimeframe, price: premiumPrice }
+      },
+      cover,
+      firstThumbnail,
+      secondThumbnail,
+      thirdThumbnail,
+      sales
+    };
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/gigs', formData);
+      console.log('Gig created successfully:', response.data);
+    } catch (error) {
+      console.error('There was an error creating the gig!', error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" placeholder="User ID" value={userId} onChange={(e) => setUserId(e.target.value)} required />
+      <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+      <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+      <input type="number" placeholder="Total Stars" value={totalStars} onChange={(e) => setTotalStars(parseInt(e.target.value, 10))} />
+      <input type="number" placeholder="Star Number" value={starNumber} onChange={(e) => setStarNumber(parseInt(e.target.value, 10))} />
+      <input type="text" placeholder="Keywords (comma-separated)" value={keywords} onChange={(e) => setKeywords(e.target.value)} required />
+
+      {/* Pricing Sections */}
+      {['basic', 'standard', 'advanced', 'pro', 'premium'].map((level) => (
+        <div key={level}>
+          <h3>{level.charAt(0).toUpperCase() + level.slice(1)} Pricing</h3>
+          <input
+            type="text"
+            placeholder="Title"
+            value={eval(`${level}Title`)}
+            onChange={(e) => eval(`set${level.charAt(0).toUpperCase() + level.slice(1)}Title`)(e.target.value)}
+          />
+          <textarea
+            placeholder="Description"
+            value={eval(`${level}Description`)}
+            onChange={(e) => eval(`set${level.charAt(0).toUpperCase() + level.slice(1)}Description`)(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Delivery Timeframe"
+            value={eval(`${level}DeliveryTimeframe`)}
+            onChange={(e) => eval(`set${level.charAt(0).toUpperCase() + level.slice(1)}DeliveryTimeframe`)(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Price"
+            value={eval(`${level}Price`)}
+            onChange={(e) => eval(`set${level.charAt(0).toUpperCase() + level.slice(1)}Price`)(parseInt(e.target.value, 10))}
+          />
+        </div>
+      ))}
+
+      <input type="text" placeholder="Cover Image URL" value={cover} onChange={(e) => setCover(e.target.value)} required />
+      <input type="text" placeholder="First Thumbnail URL" value={firstThumbnail} onChange={(e) => setFirstThumbnail(e.target.value)} />
+      <input type="text" placeholder="Second Thumbnail URL" value={secondThumbnail} onChange={(e) => setSecondThumbnail(e.target.value)} />
+      <input type="text" placeholder="Third Thumbnail URL" value={thirdThumbnail} onChange={(e) => setThirdThumbnail(e.target.value)} />
+      <input type="number" placeholder="Sales" value={sales} onChange={(e) => setSales(parseInt(e.target.value, 10))} />
+
+      <button type="submit">Create Gig</button>
+    </form>
+  );
+};
+
+export default GigForm;
